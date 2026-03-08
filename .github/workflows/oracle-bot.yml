@@ -2,7 +2,7 @@ name: Oracle Instance Auto-Creator
 
 on:
   schedule:
-    - cron: '*/8 * * * *' # Runs automatically every 10 minutes
+    - cron: '*/5 * * * *' # Runs automatically every 10 minutes
   workflow_dispatch: # Allows you to run it manually
 
 jobs:
@@ -45,4 +45,5 @@ jobs:
             --display-name "Glory-VM" \
             --image-id "ocid1.image.oc1.iad.aaaaaaaah3ahpwe2l4bpxl3q3hiz6ovnw2fmakh3ma4dnauhniktmiwxl72q" \
             --shape-config '{"ocpus": 4, "memoryInGBs": 24}' \
+            --boot-volume-size-in-gbs 100 \
             --ssh-authorized-keys-file ~/.oci/key.pub || echo "Capacity error or rate limit hit. Will retry next run."
