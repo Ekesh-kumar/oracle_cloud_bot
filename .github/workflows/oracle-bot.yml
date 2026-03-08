@@ -1,0 +1,48 @@
+name: Oracle Instance Auto-Creator
+
+on:
+  schedule:
+    - cron: '*/8 * * * *' # Runs automatically every 10 minutes
+  workflow_dispatch: # Allows you to run it manually
+
+jobs:
+  launch-instance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install OCI CLI
+        run: |
+          pip install oci-cli
+
+      - name: Configure OCI CLI
+        env:
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+        run: |
+          mkdir ~/.oci
+          echo "[DEFAULT]" >> ~/.oci/config
+          echo "user=$OCI_USER_ID" >> ~/.oci/config
+          echo "fingerprint=$OCI_KEY_FINGERPRINT" >> ~/.oci/config
+          echo "tenancy=$OCI_TENANCY_ID" >> ~/.oci/config
+          echo "region=$OCI_REGION" >> ~/.oci/config
+          echo "key_file=~/.oci/key.pem" >> ~/.oci/config
+          echo "$OCI_PRIVATE_KEY" > ~/.oci/key.pem
+          chmod 600 ~/.oci/key.pem
+
+      - name: Attempt Instance Creation
+        run: |
+          echo "Attempting to create VM.Standard.A1.Flex instance..."
+          
+          # Replace YOUR_AD_HERE and YOUR_IMAGE_OCID_HERE with the values you found
+          oci compute instance launch \
+            --availability-domain "JjPx:US-ASHBURN-AD-2" \
+            --compartment-id ${{ secrets.OCI_TENANCY_ID }} \
+            --shape "VM.Standard.A1.Flex" \
+            --subnet-id ${{ secrets.OCI_SUBNET_ID }} \
+            --assign-public-ip true \
+            --display-name "Glory-VM" \
+            --image-id "ocid1.image.oc1.iad.aaaaaaaah3ahpwe2l4bpxl3q3hiz6ovnw2fmakh3ma4dnauhniktmiwxl72q" \
+            --shape-config '{"ocpus": 4, "memoryInGBs": 24}' \
+            --ssh-authorized-keys-file ~/.oci/key.pub || echo "Capacity error or rate limit hit. Will retry next run."
