@@ -30,6 +30,7 @@ jobs:
           echo "key_file=~/.oci/key.pem" >> ~/.oci/config
           echo "$OCI_PRIVATE_KEY" > ~/.oci/key.pem
           chmod 600 ~/.oci/key.pem
+          chmod 600 ~/.oci/config
 
       - name: Attempt Instance Creation
         env:
