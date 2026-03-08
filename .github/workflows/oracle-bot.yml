@@ -34,6 +34,12 @@ jobs:
       - name: Attempt Instance Creation
         run: |
           echo "Attempting to create VM.Standard.A1.Flex instance..."
+
+          #Explicitly create the .oci directory just in case
+          mkdir -p ~/.oci
+
+          #Create the public key file for SSH access
+          echo "$OCI_PUBLIC_KEY" > ~/.oci/key.pub
           
           # Replace YOUR_AD_HERE and YOUR_IMAGE_OCID_HERE with the values you found
           oci compute instance launch \
