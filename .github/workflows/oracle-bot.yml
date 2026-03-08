@@ -2,7 +2,7 @@ name: Oracle Instance Auto-Creator
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Runs automatically every 10 minutes
+    - cron: '*/15 * * * *' # Runs automatically every 10 minutes
   workflow_dispatch: # Allows you to run it manually
 
 jobs:
